@@ -1,0 +1,125 @@
+{{ define "main" }}
+<article class="recipe-single">
+    <div class="container">
+        <header class="recipe-header">
+            <h1 class="recipe-title">{{ .Title }}</h1>
+
+            {{ if .Description }}
+            <p class="recipe-description">{{ .Description }}</p>
+            {{ end }}
+
+            <div class="recipe-meta-bar">
+                {{ if .Params.prep_time }}
+                <div class="meta-item">
+                    <span class="meta-label">Prep Time</span>
+                    <span class="meta-value">{{ partial "duration.html" .Params.prep_time }}</span>
+                </div>
+                {{ end }}
+
+                {{ if .Params.cook_time }}
+                <div class="meta-item">
+                    <span class="meta-label">Cook Time</span>
+                    <span class="meta-value">{{ partial "duration.html" .Params.cook_time }}</span>
+                </div>
+                {{ end }}
+
+                {{ if and .Params.prep_time .Params.cook_time }}
+                <div class="meta-item">
+                    <span class="meta-label">Total Time</span>
+                    <span class="meta-value">{{ partial "total-time.html" . }}</span>
+                </div>
+                {{ end }}
+
+                {{ if .Params.servings }}
+                <div class="meta-item">
+                    <span class="meta-label">Servings</span>
+                    <span class="meta-value">{{ .Params.servings }}</span>
+                </div>
+                {{ end }}
+            </div>
+
+            {{ if .Params.tags }}
+            <div class="recipe-tags-section">
+                {{ range .Params.tags }}
+                <a href="{{ "/tags/" | relLangURL }}{{ . | urlize }}" class="tag">{{ . }}</a>
+                {{ end }}
+            </div>
+            {{ end }}
+        </header>
+
+        <div class="recipe-body">
+            {{ if .Params.image }}
+            <div class="recipe-featured-image">
+                <img src="{{ .Params.image }}" alt="{{ .Title }}">
+            </div>
+            {{ end }}
+
+            <div class="recipe-content-grid">
+                <aside class="recipe-sidebar">
+                    <section class="ingredients-section">
+                        <h2 class="section-heading">Ingredients</h2>
+                        {{ if .Params.ingredients }}
+                        <ul class="ingredients-list">
+                            {{ range .Params.ingredients }}
+                            <li class="ingredient-item">
+                                <input type="checkbox" class="ingredient-checkbox">
+                                <span class="ingredient-text">{{ . }}</span>
+                            </li>
+                            {{ end }}
+                        </ul>
+                        {{ end }}
+                    </section>
+
+                    {{ if .Params.nutrition }}
+                    <section class="nutrition-section">
+                        <h2 class="section-heading">Nutrition</h2>
+                        <div class="nutrition-info">
+                            {{ .Params.nutrition | markdownify }}
+                        </div>
+                    </section>
+                    {{ end }}
+
+                    {{ if .Params.source }}
+                    <section class="source-section">
+                        <h2 class="section-heading">Source</h2>
+                        {{ if hasPrefix .Params.source "http" }}
+                        <a href="{{ .Params.source }}" target="_blank" rel="noopener" class="source-link">
+                            View Original Recipe
+                        </a>
+                        {{ else }}
+                        <span class="source-text">{{ .Params.source }}</span>
+                        {{ end }}
+                    </section>
+                    {{ end }}
+                </aside>
+
+                <div class="recipe-main">
+                    <section class="directions-section">
+                        <h2 class="section-heading">Directions</h2>
+                        {{ if .Params.directions }}
+                        <ol class="directions-list">
+                            {{ range .Params.directions }}
+                            <li class="direction-step">{{ . | markdownify }}</li>
+                            {{ end }}
+                        </ol>
+                        {{ end }}
+                    </section>
+
+                    {{ if .Params.notes }}
+                    <section class="notes-section">
+                        <h2 class="section-heading">Notes</h2>
+                        <div class="notes-content">
+                            {{ .Params.notes | markdownify }}
+                        </div>
+                    </section>
+                    {{ end }}
+                </div>
+            </div>
+        </div>
+
+        <footer class="recipe-footer">
+            <a href="/recipes/" class="back-link">&larr; Back to All Recipes</a>
+        </footer>
+    </div>
+</article>
+{{ end }}

@@ -1,0 +1,49 @@
+# ---------------------------------------------------------------------------
+# Private recipe data — never commit your CookBook Manager export to this repo.
+# Drop your exported YAML into CookBook-Recipes-YAML/ or a ZIP into imports/;
+# both are ignored. The examples/ directory ships sample recipes instead.
+# ---------------------------------------------------------------------------
+/CookBook-Recipes-YAML/
+/data/recipes/
+/imports/
+
+# Generated Hugo content (rebuilt from YAML on every convert)
+recipe-site/content/recipes/*.md
+!recipe-site/content/recipes/_index.md
+
+# Downloaded recipe images (re-downloaded on convert)
+recipe-site/static/images/recipes/
+
+# Hugo build output
+recipe-site/public/
+recipe-site/resources/
+.hugo_build.lock
+
+# Compiled recipe-tool binary
+recipe-site/recipe-tool
+
+# Go build/test artifacts
+*.exe
+*.test
+*.out
+coverage.*
+go.work
+go.work.sum
+
+# Local environment overrides
+.env
+
+# Editor / IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Claude Code local files
+.claude/
+*/.claude/
+
+# OS
+.DS_Store
+Thumbs.db

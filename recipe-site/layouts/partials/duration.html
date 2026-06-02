@@ -1,0 +1,11 @@
+{{- $d := partial "parse-duration.html" . -}}
+{{- if gt $d.hours 0 -}}
+    {{- $d.hours -}}h
+    {{- if gt $d.minutes 0 -}}
+        {{- print " " $d.minutes -}}m
+    {{- end -}}
+{{- else if gt $d.minutes 0 -}}
+    {{- $d.minutes -}}m
+{{- else -}}
+    N/A
+{{- end -}}

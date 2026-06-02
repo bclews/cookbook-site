@@ -1,0 +1,35 @@
+{{ define "main" }}
+<div class="home-hero">
+    <div class="container">
+        <h2 class="hero-title">{{ .Site.Title }}</h2>
+        <p class="hero-description">{{ .Site.Params.description }}</p>
+    </div>
+</div>
+
+<div class="container">
+    <section class="featured-tags">
+        <h3 class="section-title">Browse by Tag</h3>
+        <div class="tag-cloud">
+            {{ range $name, $taxonomy := .Site.Taxonomies.tags }}
+            {{ if gt (len $taxonomy.Pages) 0 }}
+            <a href="{{ "/tags/" | relLangURL }}{{ $name | urlize }}" class="tag-link">
+                {{ $name }} <span class="tag-count">({{ len $taxonomy.Pages }})</span>
+            </a>
+            {{ end }}
+            {{ end }}
+        </div>
+    </section>
+
+    <section class="recent-recipes">
+        <h3 class="section-title">Recent Recipes</h3>
+        <div class="recipe-grid">
+            {{ range first 12 (where .Site.RegularPages "Type" "recipes") }}
+            {{ partial "recipe-card.html" . }}
+            {{ end }}
+        </div>
+        <div class="view-all">
+            <a href="/recipes/" class="btn btn-primary">View All Recipes</a>
+        </div>
+    </section>
+</div>
+{{ end }}

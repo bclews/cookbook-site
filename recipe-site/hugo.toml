@@ -1,0 +1,54 @@
+baseURL = "/"
+locale = "en-US"
+title = "Recipe Collection"
+
+# Build content with today's date (avoids timezone edge cases)
+buildFuture = true
+
+# Pagination settings
+[pagination]
+  pagerSize = 12
+
+# Enable emoji rendering
+enableEmoji = true
+
+# Taxonomy settings for tags
+[taxonomies]
+  tag = "tags"
+  keyword = "keywords"
+
+# Menu configuration
+[menu]
+  [[menu.main]]
+    name = "Home"
+    url = "/"
+    weight = 1
+  [[menu.main]]
+    name = "All Recipes"
+    url = "/recipes/"
+    weight = 2
+  [[menu.main]]
+    name = "Tags"
+    url = "/tags/"
+    weight = 3
+
+# Site parameters
+[params]
+  description = "A collection of recipes"
+  author = ""
+
+  # Recipe display settings
+  showPrepTime = true
+  showCookTime = true
+  showServings = true
+  showNutrition = true
+
+  # Search settings
+  enableSearch = true
+
+# Output formats for search index
+[outputs]
+  home = ["HTML", "JSON"]
+  section = ["HTML"]
+  taxonomy = ["HTML"]
+  term = ["HTML"]

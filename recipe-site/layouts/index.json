@@ -1,0 +1,16 @@
+{{- $recipes := where .Site.RegularPages "Type" "recipes" -}}
+[
+  {{- range $index, $page := $recipes -}}
+  {{- if $index -}},{{- end }}
+  {
+    "title": {{ .Title | jsonify }},
+    "url": {{ .Permalink | jsonify }},
+    "description": {{ .Description | jsonify }},
+    "tags": {{ .Params.tags | jsonify }},
+    "ingredients": {{ .Params.ingredients | jsonify }},
+    "prep_time": {{ .Params.prep_time | jsonify }},
+    "cook_time": {{ .Params.cook_time | jsonify }},
+    "servings": {{ .Params.servings | jsonify }}
+  }
+  {{- end -}}
+]

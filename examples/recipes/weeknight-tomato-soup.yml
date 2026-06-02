@@ -1,0 +1,23 @@
+name: Weeknight Tomato Soup
+description: A simple stovetop tomato soup made from pantry staples.
+servings: 4 servings
+prep_time: PT5M
+cook_time: PT25M
+tags:
+  - Dinner
+  - Soup
+  - Vegetarian
+ingredients:
+  - 2 tbsp olive oil
+  - 1 onion, diced
+  - 2 cloves garlic, minced
+  - 2 x 400g tins chopped tomatoes
+  - 500 ml vegetable stock
+  - 1 tsp dried oregano
+  - Salt and pepper to taste
+directions:
+  - Heat the olive oil in a large pot over medium heat and soften the onion for 5 minutes.
+  - Add the garlic and oregano and cook for another minute.
+  - Pour in the tomatoes and stock, then simmer for 20 minutes.
+  - Blend until smooth, season to taste, and serve.
+notes: Stir through a splash of cream for a richer soup.

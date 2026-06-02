@@ -1,0 +1,22 @@
+name: Everyday Pancakes
+description: Fluffy buttermilk-style pancakes for a quick breakfast.
+servings: 12 pancakes
+prep_time: PT10M
+cook_time: PT15M
+tags:
+  - Breakfast
+  - Sweet
+ingredients:
+  - 2 cups plain flour
+  - 2 tbsp sugar
+  - 2 tsp baking powder
+  - 0.5 tsp salt
+  - 2 cups milk
+  - 2 eggs
+  - 3 tbsp melted butter
+directions:
+  - Whisk together the flour, sugar, baking powder, and salt.
+  - In a separate bowl, beat the milk, eggs, and melted butter.
+  - Combine the wet and dry ingredients until just mixed; a few lumps are fine.
+  - Cook 1/4 cup of batter per pancake on a greased pan until bubbles form, then flip.
+notes: Rest the batter for 5 minutes before cooking for fluffier pancakes.

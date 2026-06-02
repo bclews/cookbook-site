@@ -1,0 +1,20 @@
+{{ define "main" }}
+<div class="page-header">
+    <div class="container">
+        <h1 class="page-title">{{ .Title }}</h1>
+        <p class="page-description">{{ .Pages | len }} recipes tagged with "{{ .Title }}"</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="recipe-grid">
+        {{ range .Pages }}
+        {{ partial "recipe-card.html" . }}
+        {{ end }}
+    </div>
+
+    <div class="back-to-tags">
+        <a href="/tags/" class="back-link">&larr; View All Tags</a>
+    </div>
+</div>
+{{ end }}

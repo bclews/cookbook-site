@@ -1,0 +1,52 @@
+<article class="recipe-card">
+    <a href="{{ .Permalink }}" class="recipe-link">
+        {{ if .Params.image }}
+        <div class="recipe-image">
+            <img src="{{ .Params.image }}" alt="{{ .Title }}" loading="lazy">
+        </div>
+        {{ else }}
+        <div class="recipe-image recipe-image-placeholder">
+            <span class="placeholder-icon">🍽️</span>
+        </div>
+        {{ end }}
+
+        <div class="recipe-content">
+            <h3 class="recipe-title">{{ .Title }}</h3>
+
+            {{ if .Description }}
+            <p class="recipe-description">{{ .Description | truncate 100 }}</p>
+            {{ end }}
+
+            <div class="recipe-meta">
+                {{ if .Params.prep_time }}
+                <span class="meta-item">
+                    <span class="meta-icon">⏱️</span>
+                    {{ partial "duration.html" .Params.prep_time }}
+                </span>
+                {{ end }}
+
+                {{ if .Params.cook_time }}
+                <span class="meta-item">
+                    <span class="meta-icon">🔥</span>
+                    {{ partial "duration.html" .Params.cook_time }}
+                </span>
+                {{ end }}
+
+                {{ if .Params.servings }}
+                <span class="meta-item">
+                    <span class="meta-icon">👥</span>
+                    {{ .Params.servings }}
+                </span>
+                {{ end }}
+            </div>
+
+            {{ if .Params.tags }}
+            <div class="recipe-tags">
+                {{ range first 3 .Params.tags }}
+                <span class="tag">{{ . }}</span>
+                {{ end }}
+            </div>
+            {{ end }}
+        </div>
+    </a>
+</article>

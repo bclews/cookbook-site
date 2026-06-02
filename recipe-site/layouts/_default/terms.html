@@ -1,0 +1,21 @@
+{{ define "main" }}
+<div class="page-header">
+    <div class="container">
+        <h1 class="page-title">{{ .Title }}</h1>
+        <p class="page-description">Browse recipes by tag</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="tags-list">
+        {{ range .Data.Terms.Alphabetical }}
+        <div class="tag-item">
+            <a href="{{ .Page.Permalink }}" class="tag-link-large">
+                <span class="tag-name">{{ .Page.Title }}</span>
+                <span class="tag-count">{{ .Count }} {{ if eq .Count 1 }}recipe{{ else }}recipes{{ end }}</span>
+            </a>
+        </div>
+        {{ end }}
+    </div>
+</div>
+{{ end }}

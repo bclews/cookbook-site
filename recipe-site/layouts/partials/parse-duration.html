@@ -1,0 +1,26 @@
+{{- /* Parses an ISO 8601 duration string (e.g. "PT1H30M") into hours and minutes.
+       Returns a dict with "hours" and "minutes" integer keys.
+       Returns zeros for malformed input. */ -}}
+{{- $raw := . | default "PT0M" -}}
+{{- $raw = replaceRE "^PT" "" $raw -}}
+{{- $hours := 0 -}}
+{{- $minutes := 0 -}}
+
+{{- if findRE "H" $raw -}}
+    {{- $parts := split $raw "H" -}}
+    {{- $hStr := index $parts 0 -}}
+    {{- if findRE "^\\d+$" $hStr -}}
+        {{- $hours = int $hStr -}}
+    {{- end -}}
+    {{- $raw = index $parts 1 -}}
+{{- end -}}
+
+{{- if findRE "M" $raw -}}
+    {{- $parts := split $raw "M" -}}
+    {{- $mStr := index $parts 0 -}}
+    {{- if findRE "^\\d+$" $mStr -}}
+        {{- $minutes = int $mStr -}}
+    {{- end -}}
+{{- end -}}
+
+{{- return (dict "hours" $hours "minutes" $minutes) -}}

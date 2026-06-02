@@ -1,0 +1,32 @@
+<header class="site-header">
+    <div class="container">
+        <div class="header-content">
+            <h1 class="site-title">
+                <a href="/">{{ .Site.Title }}</a>
+            </h1>
+            <nav class="main-nav">
+                {{ range .Site.Menus.main }}
+                <a href="{{ .URL }}" class="nav-link {{ if $.IsMenuCurrent "main" . }}active{{ end }}">
+                    {{ .Name }}
+                </a>
+                {{ end }}
+                <button id="dark-mode-toggle" class="dark-mode-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">
+                    <span class="dark-mode-icon">🌙</span>
+                </button>
+            </nav>
+        </div>
+
+        {{ if .Site.Params.enableSearch }}
+        <div class="search-container">
+            <input
+                type="text"
+                id="search-input"
+                class="search-input"
+                placeholder="Search recipes..."
+                autocomplete="off"
+            >
+            <div id="search-results" class="search-results"></div>
+        </div>
+        {{ end }}
+    </div>
+</header>

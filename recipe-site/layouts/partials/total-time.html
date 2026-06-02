@@ -1,0 +1,21 @@
+{{- $prep := partial "parse-duration.html" (.Params.prep_time | default "PT0M") -}}
+{{- $cook := partial "parse-duration.html" (.Params.cook_time | default "PT0M") -}}
+
+{{- $totalHours := add $prep.hours $cook.hours -}}
+{{- $totalMinutes := add $prep.minutes $cook.minutes -}}
+
+{{- if ge $totalMinutes 60 -}}
+    {{- $totalHours = add $totalHours (div $totalMinutes 60) -}}
+    {{- $totalMinutes = mod $totalMinutes 60 -}}
+{{- end -}}
+
+{{- if gt $totalHours 0 -}}
+    {{- $totalHours -}}h
+    {{- if gt $totalMinutes 0 -}}
+        {{- print " " $totalMinutes -}}m
+    {{- end -}}
+{{- else if gt $totalMinutes 0 -}}
+    {{- $totalMinutes -}}m
+{{- else -}}
+    N/A
+{{- end -}}

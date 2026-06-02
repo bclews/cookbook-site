@@ -1,0 +1,40 @@
+{{ define "main" }}
+<div class="page-header">
+    <div class="container">
+        <h1 class="page-title">{{ .Title }}</h1>
+        {{ if .Description }}
+        <p class="page-description">{{ .Description }}</p>
+        {{ end }}
+    </div>
+</div>
+
+<div class="container">
+    {{ if eq .Type "recipes" }}
+    <div class="filter-controls">
+        <div class="active-filters" id="active-filters"></div>
+    </div>
+    {{ end }}
+
+    <div class="recipe-grid">
+        {{ range .Paginator.Pages }}
+        {{ partial "recipe-card.html" . }}
+        {{ end }}
+    </div>
+
+    {{ if gt .Paginator.TotalPages 1 }}
+    <nav class="pagination">
+        {{ if .Paginator.HasPrev }}
+        <a href="{{ .Paginator.Prev.URL }}" class="pagination-link">&laquo; Previous</a>
+        {{ end }}
+
+        <span class="pagination-info">
+            Page {{ .Paginator.PageNumber }} of {{ .Paginator.TotalPages }}
+        </span>
+
+        {{ if .Paginator.HasNext }}
+        <a href="{{ .Paginator.Next.URL }}" class="pagination-link">Next &raquo;</a>
+        {{ end }}
+    </nav>
+    {{ end }}
+</div>
+{{ end }}
