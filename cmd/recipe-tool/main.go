@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/bclews/cookbook-site/recipe-site/internal/recipes"
+	"github.com/bclews/cookbook-site/internal/recipes"
 )
 
 func main() {

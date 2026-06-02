@@ -26,23 +26,23 @@ install: ## Check that Hugo and Go are installed
 
 build-tool: ## Build the recipe-tool binary
 	@echo "$(BLUE)Building recipe-tool...$(RESET)"
-	@CGO_ENABLED=0 go build -o recipe-site/recipe-tool ./recipe-site/cmd/recipe-tool
+	@CGO_ENABLED=0 go build -o bin/recipe-tool ./cmd/recipe-tool
 
 validate: build-tool ## Validate YAML recipe files
 	@echo "$(BLUE)Validating recipe files...$(RESET)"
-	@cd recipe-site && ./recipe-tool validate
+	@cd recipe-site && ../bin/recipe-tool validate
 
 convert: build-tool ## Convert YAML recipes to Hugo markdown
 	@echo "$(BLUE)Converting recipes (parallel=$(PARALLEL))...$(RESET)"
-	@cd recipe-site && ./recipe-tool convert --parallel $(PARALLEL)
+	@cd recipe-site && ../bin/recipe-tool convert --parallel $(PARALLEL)
 
 import: build-tool ## Extract ZIP file from imports/ directory
 	@echo "$(BLUE)Importing recipe ZIP file...$(RESET)"
-	@cd recipe-site && ./recipe-tool import
+	@cd recipe-site && ../bin/recipe-tool import
 
 clean-imports: build-tool ## Remove extracted files and ZIP from imports/
 	@echo "$(BLUE)Cleaning imports directory...$(RESET)"
-	@cd recipe-site && ./recipe-tool cleanup
+	@cd recipe-site && ../bin/recipe-tool cleanup
 
 clean-recipes: ## Remove all converted recipe markdown files (for full sync)
 	@echo "$(BLUE)Cleaning existing recipes for full sync...$(RESET)"
@@ -53,14 +53,14 @@ clean-recipes: ## Remove all converted recipe markdown files (for full sync)
 _auto-import: build-tool
 	@if [ -n "$$(find imports -maxdepth 1 -name '*.zip' 2>/dev/null | head -1)" ]; then \
 		echo "$(BLUE)ZIP detected in imports/, importing...$(RESET)"; \
-		cd recipe-site && ./recipe-tool import; \
+		cd recipe-site && ../bin/recipe-tool import; \
 		find recipe-site/content/recipes -name '*.md' ! -name '_index.md' -delete 2>/dev/null || true; \
 	fi
 
 build: _auto-import validate convert ## Build the static site into recipe-site/public/
 	@echo "$(BLUE)Building site...$(RESET)"
 	@cd recipe-site && hugo --minify
-	@if [ -d "imports/.extracted" ]; then cd recipe-site && ./recipe-tool cleanup; fi
+	@if [ -d "imports/.extracted" ]; then cd recipe-site && ../bin/recipe-tool cleanup; fi
 	@echo "$(GREEN)Site built in recipe-site/public/$(RESET)"
 
 serve: build-tool ## Run development server
@@ -75,7 +75,7 @@ clean: ## Clean generated files (FULL=1 includes images)
 	@echo "$(BLUE)Cleaning generated files...$(RESET)"
 	@find recipe-site/content/recipes -name '*.md' ! -name '_index.md' -delete 2>/dev/null || true
 	@rm -rf recipe-site/public/*
-	@rm -f recipe-site/recipe-tool
+	@rm -rf bin
 ifdef FULL
 	@rm -rf recipe-site/static/images/recipes/*
 	@echo "$(GREEN)Cleaned content, public, and images$(RESET)"
@@ -85,13 +85,13 @@ endif
 
 test: ## Run Go unit tests
 	@echo "$(BLUE)Running tests...$(RESET)"
-	@CGO_ENABLED=0 go test ./recipe-site/... -v
+	@CGO_ENABLED=0 go test ./... -v
 
 lint: ## Run Go formatting check and vet
 	@echo "$(BLUE)Checking formatting...$(RESET)"
-	@test -z "$$(gofmt -l ./recipe-site/)" || { echo "$(RED)Files need formatting:$(RESET)"; gofmt -l ./recipe-site/; exit 1; }
+	@test -z "$$(gofmt -l cmd internal)" || { echo "$(RED)Files need formatting:$(RESET)"; gofmt -l cmd internal; exit 1; }
 	@echo "$(BLUE)Running go vet...$(RESET)"
-	@go vet ./recipe-site/...
+	@go vet ./...
 	@echo "$(GREEN)Lint passed$(RESET)"
 
 stats: ## Show repository statistics
@@ -117,7 +117,7 @@ stats: ## Show repository statistics
 # Quick rebuild without re-downloading images
 quick-build: build-tool validate ## Quick rebuild (skip image downloads)
 	@echo "$(BLUE)Quick rebuild (skipping image downloads)...$(RESET)"
-	@cd recipe-site && ./recipe-tool convert --skip-images
+	@cd recipe-site && ../bin/recipe-tool convert --skip-images
 	@cd recipe-site && hugo --minify
 	@echo "$(GREEN)Quick build complete$(RESET)"
 

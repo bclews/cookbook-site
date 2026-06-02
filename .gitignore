@@ -20,7 +20,7 @@ recipe-site/resources/
 .hugo_build.lock
 
 # Compiled recipe-tool binary
-recipe-site/recipe-tool
+/bin/
 
 # Go build/test artifacts
 *.exe

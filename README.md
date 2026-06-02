@@ -135,17 +135,21 @@ build reuses already-downloaded images instead of fetching them again.
 
 ```
 .
-├── recipe-site/
-│   ├── cmd/recipe-tool/      # CLI entry point
-│   ├── internal/recipes/     # validate, convert, download, import packages
+├── cmd/recipe-tool/          # CLI entry point (the recipe-tool generator)
+├── internal/recipes/         # validate, convert, download, import packages
+├── recipe-site/              # the Hugo site
 │   ├── layouts/              # Hugo templates
 │   ├── static/css, static/js # vanilla CSS and JavaScript
 │   ├── content/recipes/      # generated markdown (git-ignored except _index.md)
 │   └── hugo.toml             # Hugo configuration
 ├── examples/recipes/         # sample recipes used by the quick start
+├── bin/                      # compiled recipe-tool (git-ignored)
 ├── Makefile                  # build automation
 └── .github/workflows/ci.yml  # lint, test, and a smoke build
 ```
+
+The Go generator (`cmd/`, `internal/`) lives at the repository root, separate
+from the Hugo site in `recipe-site/`.
 
 The generated markdown in `content/recipes/` and the downloaded images in
 `static/images/recipes/` are rebuilt from YAML, so they are not tracked in git.

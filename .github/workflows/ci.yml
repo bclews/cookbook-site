@@ -30,13 +30,13 @@ jobs:
           cache-dependency-path: go.sum
 
       - name: Check formatting
-        run: test -z "$(gofmt -l ./recipe-site/)" || { gofmt -l ./recipe-site/; exit 1; }
+        run: test -z "$(gofmt -l cmd internal)" || { gofmt -l cmd internal; exit 1; }
 
       - name: Vet
-        run: go vet ./recipe-site/...
+        run: go vet ./...
 
       - name: Test
-        run: CGO_ENABLED=0 go test ./recipe-site/...
+        run: CGO_ENABLED=0 go test ./...
 
       - name: Verify modules
         run: go mod verify
@@ -62,10 +62,10 @@ jobs:
           extended: true
 
       - name: Build recipe-tool
-        run: CGO_ENABLED=0 go build -o recipe-site/recipe-tool ./recipe-site/cmd/recipe-tool
+        run: CGO_ENABLED=0 go build -o bin/recipe-tool ./cmd/recipe-tool
 
       - name: Convert example recipes
-        run: cd recipe-site && ./recipe-tool convert --yaml-dir ../examples/recipes --skip-images
+        run: cd recipe-site && ../bin/recipe-tool convert --yaml-dir ../examples/recipes --skip-images
 
       - name: Build site
         run: cd recipe-site && hugo --minify

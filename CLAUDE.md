@@ -17,7 +17,7 @@ make serve       # Hugo dev server (needs recipes converted first)
 make validate    # validate recipe YAML
 make convert     # YAML -> Hugo markdown (PARALLEL=N sets image workers, default 10)
 make quick-build # rebuild without re-downloading images
-make test        # CGO_ENABLED=0 go test ./recipe-site/...
+make test        # CGO_ENABLED=0 go test ./...
 make lint        # gofmt check + go vet
 make clean       # remove generated markdown and public/ (FULL=1 also images)
 ```
@@ -25,15 +25,18 @@ make clean       # remove generated markdown and public/ (FULL=1 also images)
 Run a single test:
 
 ```bash
-CGO_ENABLED=0 go test ./recipe-site/internal/recipes/ -run TestName -v
+CGO_ENABLED=0 go test ./internal/recipes/ -run TestName -v
 ```
 
 ## Architecture
 
-- `recipe-site/cmd/recipe-tool/main.go` — CLI: `validate`, `convert`, `import`,
+The Go generator (`cmd/`, `internal/`) lives at the repository root, separate
+from the Hugo site in `recipe-site/`. The compiled binary builds to `bin/`.
+
+- `cmd/recipe-tool/main.go` — CLI: `validate`, `convert`, `import`,
   `cleanup`. Resolves the Hugo site root by walking up from the working
   directory to the nearest `hugo.toml` (`siteRootDir`).
-- `recipe-site/internal/recipes/`
+- `internal/recipes/`
   - `types.go` — `Recipe` struct; `StringOrSlice` accepts a YAML string or list.
   - `validate.go` — required/recommended field checks.
   - `convert.go` — YAML to Hugo markdown; `FindYAMLDirectory` discovery order.
