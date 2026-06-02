@@ -277,13 +277,15 @@ func TestExtractZIP(t *testing.T) {
 			t.Fatalf("ExtractZIP() error = %v", err)
 		}
 
-		// Verify the malicious file was NOT created outside destDir
-		if _, err := os.Stat(filepath.Join(tmpDir, "..", "..", "..", "etc", "passwd")); !os.IsNotExist(err) {
-			t.Error("Path traversal prevention failed - file created outside destination")
+		// Verify the malicious entry was skipped rather than extracted.
+		// Extraction flattens to filepath.Base, so a successful traversal would
+		// surface as a "passwd" file inside the extraction directory.
+		extractedPath := filepath.Join(destDir, "CookBook-Recipes-YAML")
+		if _, err := os.Stat(filepath.Join(extractedPath, "passwd")); !os.IsNotExist(err) {
+			t.Error("Path traversal prevention failed - malicious file was extracted")
 		}
 
 		// Verify safe file was extracted
-		extractedPath := filepath.Join(destDir, "CookBook-Recipes-YAML")
 		if _, err := os.Stat(filepath.Join(extractedPath, "safe.yml")); os.IsNotExist(err) {
 			t.Error("Safe file was not extracted")
 		}
