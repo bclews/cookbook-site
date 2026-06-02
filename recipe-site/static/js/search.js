@@ -102,6 +102,16 @@
                 });
             }
 
+            // Search in keywords
+            if (recipe.keywords) {
+                recipe.keywords.forEach(keyword => {
+                    if (keyword.toLowerCase().includes(queryLower)) {
+                        score += 3;
+                        matchDetails.push('keyword: ' + keyword);
+                    }
+                });
+            }
+
             // Search in ingredients
             if (recipe.ingredients) {
                 recipe.ingredients.forEach(ingredient => {

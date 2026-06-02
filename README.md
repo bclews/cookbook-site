@@ -17,8 +17,8 @@ immediately. Your own recipes stay on your machine — see
 
 ## Requirements
 
-- [Go](https://go.dev/doc/install) 1.22 or later
-- [Hugo](https://gohugo.io/installation/) (extended) 0.158.0 or later
+- [Go](https://go.dev/doc/install) 1.22.4 or later
+- [Hugo](https://gohugo.io/installation/) (extended) 0.161.1 or later
 
 Run `make install` to check that both are present.
 
@@ -72,9 +72,12 @@ prep_time: PT5M          # ISO 8601 duration
 cook_time: PT25M
 source: https://example.com/recipe
 image: https://example.com/soup.jpg
-tags:
+tags:                      # browsable tag pages at /tags/
   - Dinner
   - Soup
+keywords:                  # extra search/SEO terms, not shown on the page
+  - pantry
+  - vegetarian
 ingredients:
   - 2 tbsp olive oil
   - 1 onion, diced
@@ -89,6 +92,10 @@ notes: Stir through cream for a richer soup.
 Times use ISO 8601 durations: `PT15M` (15 minutes), `PT1H` (1 hour),
 `PT1H30M` (1 hour 30 minutes). `make validate` reports missing or malformed
 fields before you build.
+
+`tags` generate browsable pages under `/tags/`; `keywords` are not displayed
+but feed the client-side search and the page's `keywords` metadata. Both accept
+either a single value or a list.
 
 ## Commands
 

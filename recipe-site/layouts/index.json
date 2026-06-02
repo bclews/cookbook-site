@@ -7,6 +7,7 @@
     "url": {{ .Permalink | jsonify }},
     "description": {{ .Description | jsonify }},
     "tags": {{ .Params.tags | jsonify }},
+    "keywords": {{ .Params.keywords | jsonify }},
     "ingredients": {{ .Params.ingredients | jsonify }},
     "prep_time": {{ .Params.prep_time | jsonify }},
     "cook_time": {{ .Params.cook_time | jsonify }},

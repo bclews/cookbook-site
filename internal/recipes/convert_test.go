@@ -502,6 +502,50 @@ func TestConvertAll(t *testing.T) {
 			t.Errorf("ConvertAll() with empty list: success=%d, failed=%d, want 0,0", success, failed)
 		}
 	})
+
+	t.Run("prunes stale markdown but preserves _index.md", func(t *testing.T) {
+		tmpDir := t.TempDir()
+		outputDir := filepath.Join(tmpDir, "output")
+		if err := os.MkdirAll(outputDir, 0755); err != nil {
+			t.Fatalf("Failed to create output dir: %v", err)
+		}
+
+		// Pre-existing files: the section page, a stale recipe from a previous
+		// run, and a non-markdown file that must be left untouched.
+		preExisting := map[string]string{
+			"_index.md": "---\ntitle: All\n---\n",
+			"orphan.md": "---\ntitle: Orphan\n---\n",
+			"notes.txt": "keep me",
+		}
+		for name, content := range preExisting {
+			if err := os.WriteFile(filepath.Join(outputDir, name), []byte(content), 0644); err != nil {
+				t.Fatalf("Failed to write %s: %v", name, err)
+			}
+		}
+
+		sourceFile := filepath.Join(tmpDir, "source.yml")
+		if err := os.WriteFile(sourceFile, []byte("test"), 0644); err != nil {
+			t.Fatalf("Failed to create source file: %v", err)
+		}
+
+		recipes := []RecipeFile{
+			{Path: sourceFile, Recipe: &Recipe{Name: "Fresh Recipe"}},
+		}
+
+		ConvertAll(recipes, outputDir, nil)
+
+		// The freshly converted recipe and _index.md survive; the non-markdown
+		// file is ignored; the orphaned markdown is removed.
+		mustExist := []string{"fresh-recipe.md", "_index.md", "notes.txt"}
+		for _, f := range mustExist {
+			if _, err := os.Stat(filepath.Join(outputDir, f)); err != nil {
+				t.Errorf("Expected %s to exist, got error: %v", f, err)
+			}
+		}
+		if _, err := os.Stat(filepath.Join(outputDir, "orphan.md")); !os.IsNotExist(err) {
+			t.Errorf("Expected orphan.md to be pruned, but it still exists")
+		}
+	})
 }
 
 func TestFindYAMLDirectory(t *testing.T) {

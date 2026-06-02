@@ -13,6 +13,12 @@ import (
 var testBinaryPath string
 
 // TestMain builds the binary once for all tests to improve performance.
+//
+// These are black-box tests: they exercise the CLI by executing the compiled
+// binary as a subprocess rather than calling functions in-process. That makes
+// them realistic but means `go test -cover` reports 0% for package main, since
+// the coverage tooling only instruments the in-process test binary. The
+// behavior is fully covered; the coverage percentage just doesn't reflect it.
 func TestMain(m *testing.M) {
 	// Create a temporary directory for the test binary
 	tempDir, err := os.MkdirTemp("", "recipe-tool-test-*")

@@ -299,6 +299,43 @@ func TestImageDownloader_InvalidURL(t *testing.T) {
 	}
 }
 
+func TestDialControl(t *testing.T) {
+	tempDir := t.TempDir()
+	downloader := NewImageDownloader(tempDir, 1)
+
+	// Addresses are post-DNS-resolution "ip:port" pairs, as the net.Dialer
+	// passes them to Control. This guard is what stops redirect-based SSRF and
+	// DNS rebinding from reaching internal hosts.
+	blocked := []string{
+		"127.0.0.1:80",       // loopback
+		"10.0.0.5:443",       // private
+		"192.168.1.1:80",     // private
+		"169.254.169.254:80", // link-local (cloud metadata)
+		"0.0.0.0:80",         // unspecified
+	}
+	for _, addr := range blocked {
+		if err := downloader.dialControl("tcp", addr, nil); err == nil {
+			t.Errorf("dialControl allowed %q, expected it to be blocked", addr)
+		}
+	}
+
+	allowed := []string{
+		"93.184.216.34:443", // public (example.com)
+		"8.8.8.8:53",        // public
+	}
+	for _, addr := range allowed {
+		if err := downloader.dialControl("tcp", addr, nil); err != nil {
+			t.Errorf("dialControl blocked public %q: %v", addr, err)
+		}
+	}
+
+	// With test URLs allowed, even loopback is permitted (used by httptest).
+	testDownloader := NewImageDownloader(tempDir, 1, WithAllowTestURLs(true))
+	if err := testDownloader.dialControl("tcp", "127.0.0.1:80", nil); err != nil {
+		t.Errorf("dialControl with allowTestURLs blocked loopback: %v", err)
+	}
+}
+
 func TestImageDownloader_FileExtensions(t *testing.T) {
 	tests := []struct {
 		urlPath string

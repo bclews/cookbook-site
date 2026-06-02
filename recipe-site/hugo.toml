@@ -12,10 +12,19 @@ buildFuture = true
 # Enable emoji rendering
 enableEmoji = true
 
-# Taxonomy settings for tags
+# Recipe exports (notes, directions) often contain inline HTML. Render it
+# instead of silently dropping it. The content is your own and the site is
+# self-hosted; the Content-Security-Policy in baseof.html limits what any
+# embedded markup can do.
+[markup]
+  [markup.goldmark.renderer]
+    unsafe = true
+
+# Taxonomy settings for tags.
+# Keywords are deliberately not a taxonomy: they feed search and SEO metadata
+# rather than generating browsable pages (see layouts/index.json and baseof.html).
 [taxonomies]
   tag = "tags"
-  keyword = "keywords"
 
 # Menu configuration
 [menu]

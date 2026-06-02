@@ -49,12 +49,13 @@ clean-recipes: ## Remove all converted recipe markdown files (for full sync)
 	@find recipe-site/content/recipes -name '*.md' ! -name '_index.md' -delete 2>/dev/null || true
 	@echo "$(GREEN)Cleaned recipe-site/content/recipes/$(RESET)"
 
-# Internal helper: auto-import ZIP if present
+# Internal helper: auto-import ZIP if present.
+# Stale markdown from removed/renamed recipes is pruned by `convert` itself,
+# so no manual cleanup is needed here.
 _auto-import: build-tool
 	@if [ -n "$$(find imports -maxdepth 1 -name '*.zip' 2>/dev/null | head -1)" ]; then \
 		echo "$(BLUE)ZIP detected in imports/, importing...$(RESET)"; \
 		cd recipe-site && ../bin/recipe-tool import; \
-		find recipe-site/content/recipes -name '*.md' ! -name '_index.md' -delete 2>/dev/null || true; \
 	fi
 
 build: _auto-import validate convert ## Build the static site into recipe-site/public/

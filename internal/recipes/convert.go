@@ -208,6 +208,11 @@ func ConvertRecipe(rf RecipeFile, outputDir string, imageMap map[string]string) 
 // Progress is logged every ConversionProgressInterval recipes (default: 50).
 // Individual failures are logged but do not stop the overall conversion.
 //
+// After conversion, stale markdown files in outputDir — those left over from
+// recipes that have since been renamed or deleted in the source — are removed,
+// so the output directory always mirrors the current source set. The section
+// page "_index.md" is always preserved.
+//
 // Parameters:
 //   - recipes: slice of RecipeFile structs to convert
 //   - outputDir: directory where markdown files will be created
@@ -220,7 +225,13 @@ func ConvertAll(recipes []RecipeFile, outputDir string, imageMap map[string]stri
 	successCount := 0
 	failedCount := 0
 
+	// Track the filenames we expect to exist after this run so we can prune
+	// orphaned markdown from recipes that no longer appear in the source.
+	expected := map[string]bool{"_index.md": true}
+
 	for i, rf := range recipes {
+		expected[SanitizeFilename(rf.Recipe.Name)+".md"] = true
+
 		if err := ConvertRecipe(rf, outputDir, imageMap); err != nil {
 			Logger.Error("Error converting recipe", "name", rf.Recipe.Name, "error", err)
 			failedCount++
@@ -233,7 +244,33 @@ func ConvertAll(recipes []RecipeFile, outputDir string, imageMap map[string]stri
 		}
 	}
 
+	pruneStaleMarkdown(outputDir, expected)
+
 	return successCount, failedCount
+}
+
+// pruneStaleMarkdown removes *.md files in outputDir whose names are not in the
+// expected set, keeping the generated content directory in sync with the
+// current source. Errors are logged rather than returned so a failed prune
+// never aborts an otherwise successful conversion.
+func pruneStaleMarkdown(outputDir string, expected map[string]bool) {
+	entries, err := os.ReadDir(outputDir)
+	if err != nil {
+		Logger.Warn("Could not scan output directory to prune stale files", "dir", outputDir, "error", err)
+		return
+	}
+
+	for _, entry := range entries {
+		name := entry.Name()
+		if entry.IsDir() || !strings.HasSuffix(name, ".md") || expected[name] {
+			continue
+		}
+		if err := os.Remove(filepath.Join(outputDir, name)); err != nil {
+			Logger.Warn("Failed to remove stale markdown file", "file", name, "error", err)
+			continue
+		}
+		Logger.Info("Removed stale markdown file", "file", name)
+	}
 }
 
 // FindYAMLDirectory locates the directory of YAML recipe files, given the Hugo

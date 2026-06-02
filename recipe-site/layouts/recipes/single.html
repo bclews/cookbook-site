@@ -8,29 +8,31 @@
             <p class="recipe-description">{{ .Description }}</p>
             {{ end }}
 
+            {{ $showPrep := and (ne .Site.Params.showPrepTime false) .Params.prep_time }}
+            {{ $showCook := and (ne .Site.Params.showCookTime false) .Params.cook_time }}
             <div class="recipe-meta-bar">
-                {{ if .Params.prep_time }}
+                {{ if $showPrep }}
                 <div class="meta-item">
                     <span class="meta-label">Prep Time</span>
                     <span class="meta-value">{{ partial "duration.html" .Params.prep_time }}</span>
                 </div>
                 {{ end }}
 
-                {{ if .Params.cook_time }}
+                {{ if $showCook }}
                 <div class="meta-item">
                     <span class="meta-label">Cook Time</span>
                     <span class="meta-value">{{ partial "duration.html" .Params.cook_time }}</span>
                 </div>
                 {{ end }}
 
-                {{ if and .Params.prep_time .Params.cook_time }}
+                {{ if and $showPrep $showCook }}
                 <div class="meta-item">
                     <span class="meta-label">Total Time</span>
                     <span class="meta-value">{{ partial "total-time.html" . }}</span>
                 </div>
                 {{ end }}
 
-                {{ if .Params.servings }}
+                {{ if and (ne .Site.Params.showServings false) .Params.servings }}
                 <div class="meta-item">
                     <span class="meta-label">Servings</span>
                     <span class="meta-value">{{ .Params.servings }}</span>
@@ -70,7 +72,7 @@
                         {{ end }}
                     </section>
 
-                    {{ if .Params.nutrition }}
+                    {{ if and (ne .Site.Params.showNutrition false) .Params.nutrition }}
                     <section class="nutrition-section">
                         <h2 class="section-heading">Nutrition</h2>
                         <div class="nutrition-info">

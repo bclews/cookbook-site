@@ -14,6 +14,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"syscall"
 	"time"
 
 	"golang.org/x/time/rate"
@@ -43,7 +44,16 @@ func WithAllowTestURLs(allow bool) ImageDownloaderOption {
 // NewImageDownloader creates a new downloader with the specified concurrency.
 // Options can be provided to customize behavior (e.g., WithAllowTestURLs for testing).
 func NewImageDownloader(imagesDir string, maxWorkers int, opts ...ImageDownloaderOption) *ImageDownloader {
-	// Create HTTP transport with security hardening
+	d := &ImageDownloader{
+		imagesDir:  imagesDir,
+		maxWorkers: maxWorkers,
+		limiter:    rate.NewLimiter(rate.Limit(RateLimitPerSecond), RateLimitBurst),
+	}
+
+	// Create HTTP transport with security hardening. The dialer's Control hook
+	// rejects connections to non-public addresses at dial time, which closes
+	// the SSRF gaps that a URL-only check leaves open: redirects to internal
+	// hosts and hostnames that resolve to private IPs (DNS rebinding).
 	transport := &http.Transport{
 		TLSClientConfig: &tls.Config{
 			MinVersion: tls.VersionTLS12,
@@ -54,23 +64,19 @@ func NewImageDownloader(imagesDir string, maxWorkers int, opts ...ImageDownloade
 		DialContext: (&net.Dialer{
 			Timeout:   DialTimeout,
 			KeepAlive: KeepAliveInterval,
+			Control:   d.dialControl,
 		}).DialContext,
 	}
 
-	d := &ImageDownloader{
-		imagesDir:  imagesDir,
-		maxWorkers: maxWorkers,
-		client: &http.Client{
-			Timeout:   DownloadTimeout,
-			Transport: transport,
-			CheckRedirect: func(req *http.Request, via []*http.Request) error {
-				if len(via) >= MaxRedirects {
-					return fmt.Errorf("too many redirects (max %d)", MaxRedirects)
-				}
-				return nil
-			},
+	d.client = &http.Client{
+		Timeout:   DownloadTimeout,
+		Transport: transport,
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			if len(via) >= MaxRedirects {
+				return fmt.Errorf("too many redirects (max %d)", MaxRedirects)
+			}
+			return nil
 		},
-		limiter: rate.NewLimiter(rate.Limit(RateLimitPerSecond), RateLimitBurst),
 	}
 
 	// Apply options
@@ -79,6 +85,34 @@ func NewImageDownloader(imagesDir string, maxWorkers int, opts ...ImageDownloade
 	}
 
 	return d
+}
+
+// dialControl runs after DNS resolution, just before the socket connects. It
+// blocks loopback, private, link-local (including the 169.254.169.254 cloud
+// metadata endpoint), and unspecified addresses. Because every dial — initial
+// request or redirect — passes through here, it guards against redirect-based
+// SSRF and DNS rebinding that the URL-level check cannot catch.
+func (d *ImageDownloader) dialControl(network, address string, _ syscall.RawConn) error {
+	if d.allowTestURLs {
+		return nil
+	}
+
+	host, _, err := net.SplitHostPort(address)
+	if err != nil {
+		return fmt.Errorf("parsing dial address %q: %w", address, err)
+	}
+
+	ip := net.ParseIP(host)
+	if ip == nil {
+		return fmt.Errorf("refusing to connect to unresolved address %q", host)
+	}
+
+	if ip.IsLoopback() || ip.IsPrivate() || ip.IsLinkLocalUnicast() ||
+		ip.IsLinkLocalMulticast() || ip.IsUnspecified() {
+		return fmt.Errorf("refusing to connect to non-public address %s", ip)
+	}
+
+	return nil
 }
 
 // downloadTask represents a single image download job.
@@ -296,9 +330,10 @@ func (d *ImageDownloader) downloadImageWithContext(ctx context.Context, imageURL
 	var lastErr error
 
 	for attempt := 0; attempt < MaxRetries; attempt++ {
-		// Apply backoff delay for retries (1s, 2s, 4s)
+		// Apply exponential backoff before each retry: RetryBaseDelay doubled
+		// per attempt (with the defaults, 1s then 2s).
 		if attempt > 0 {
-			backoff := time.Duration(1<<uint(attempt)) * time.Second
+			backoff := RetryBaseDelay * time.Duration(1<<uint(attempt-1))
 			Logger.Debug("Retrying download", "url", imageURL, "attempt", attempt+1, "backoff", backoff)
 			select {
 			case <-ctx.Done():

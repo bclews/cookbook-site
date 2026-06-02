@@ -59,7 +59,7 @@ title = "Recipe Collection"
 The search index is generated at `/index.json` whenever the site is built,
 driven by `layouts/index.json` and the `[outputs]` block in `hugo.toml`.
 `static/js/search.js` fetches it and ranks matches by title, description, tags,
-and ingredients. No server is involved.
+keywords, and ingredients. No server is involved.
 
 ## Generated content
 

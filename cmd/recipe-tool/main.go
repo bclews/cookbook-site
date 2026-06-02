@@ -5,9 +5,15 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime/debug"
 
 	"github.com/bclews/cookbook-site/internal/recipes"
 )
+
+// version is the tool's version. It is overridden at build time via
+// -ldflags "-X main.version=<tag>"; otherwise it reports the module's build
+// info, falling back to "dev" for un-versioned local builds.
+var version = ""
 
 func main() {
 	if len(os.Args) < 2 {
@@ -24,6 +30,8 @@ func main() {
 		importCmd(os.Args[2:])
 	case "cleanup":
 		cleanupCmd(os.Args[2:])
+	case "version", "-v", "--version":
+		fmt.Printf("recipe-tool %s\n", resolveVersion())
 	case "help", "-h", "--help":
 		printUsage()
 	default:
@@ -31,6 +39,18 @@ func main() {
 		printUsage()
 		os.Exit(1)
 	}
+}
+
+// resolveVersion returns the version string set at build time, or the version
+// embedded in the binary's build info, or "dev" if neither is available.
+func resolveVersion() string {
+	if version != "" {
+		return version
+	}
+	if info, ok := debug.ReadBuildInfo(); ok && info.Main.Version != "" && info.Main.Version != "(devel)" {
+		return info.Main.Version
+	}
+	return "dev"
 }
 
 // siteRootDir returns the Hugo site root: the nearest ancestor of the current
@@ -77,6 +97,7 @@ func printUsage() {
 	fmt.Println("  convert     Convert YAML recipes to Hugo markdown")
 	fmt.Println("  import      Extract ZIP file from imports directory")
 	fmt.Println("  cleanup     Remove extracted files and ZIPs from imports")
+	fmt.Println("  version     Print the recipe-tool version")
 	fmt.Println("  help        Show this help message")
 	fmt.Println()
 	fmt.Println("Run 'recipe-tool <command> -h' for command-specific options")
@@ -204,7 +225,7 @@ type convertOptions struct {
 func parseConvertFlags(args []string) convertOptions {
 	fs := flag.NewFlagSet("convert", flag.ExitOnError)
 	yamlDir := fs.String("yaml-dir", "", "Path to YAML recipes directory (auto-discovered if not specified)")
-	parallel := fs.Int("parallel", 10, "Number of parallel image downloads")
+	parallel := fs.Int("parallel", recipes.DefaultParallelDownloads, "Number of parallel image downloads")
 	skipImages := fs.Bool("skip-images", false, "Skip image downloading")
 	_ = fs.Parse(args)
 

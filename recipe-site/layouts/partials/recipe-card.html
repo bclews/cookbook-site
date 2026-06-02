@@ -18,21 +18,21 @@
             {{ end }}
 
             <div class="recipe-meta">
-                {{ if .Params.prep_time }}
+                {{ if and (ne .Site.Params.showPrepTime false) .Params.prep_time }}
                 <span class="meta-item">
                     <span class="meta-icon">⏱️</span>
                     {{ partial "duration.html" .Params.prep_time }}
                 </span>
                 {{ end }}
 
-                {{ if .Params.cook_time }}
+                {{ if and (ne .Site.Params.showCookTime false) .Params.cook_time }}
                 <span class="meta-item">
                     <span class="meta-icon">🔥</span>
                     {{ partial "duration.html" .Params.cook_time }}
                 </span>
                 {{ end }}
 
-                {{ if .Params.servings }}
+                {{ if and (ne .Site.Params.showServings false) .Params.servings }}
                 <span class="meta-item">
                     <span class="meta-icon">👥</span>
                     {{ .Params.servings }}

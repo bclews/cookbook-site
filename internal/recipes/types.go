@@ -56,10 +56,15 @@ type Recipe struct {
 	Nutrition   string        `yaml:"nutrition,omitempty"`
 	Notes       string        `yaml:"notes,omitempty"`
 	Favorite    bool          `yaml:"favorite,omitempty"`
-	OnFavorites string        `yaml:"on_favorites,omitempty"`
 	CookCount   int           `yaml:"cook_count,omitempty"`
-	Images      []string      `yaml:"images,omitempty"`
-	ExportedBy  string        `yaml:"exportedBy,omitempty"`
+
+	// The fields below are accepted so that unmodified CookBook Manager exports
+	// parse cleanly, but they are intentionally not carried into the generated
+	// site (only the single `image` field is rendered). They are retained for
+	// forward compatibility and to avoid "unknown field" surprises.
+	OnFavorites string   `yaml:"on_favorites,omitempty"`
+	Images      []string `yaml:"images,omitempty"`
+	ExportedBy  string   `yaml:"exportedBy,omitempty"`
 }
 
 // RecipeFile holds a recipe and its source file path.

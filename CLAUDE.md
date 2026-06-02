@@ -34,12 +34,14 @@ The Go generator (`cmd/`, `internal/`) lives at the repository root, separate
 from the Hugo site in `recipe-site/`. The compiled binary builds to `bin/`.
 
 - `cmd/recipe-tool/main.go` — CLI: `validate`, `convert`, `import`,
-  `cleanup`. Resolves the Hugo site root by walking up from the working
-  directory to the nearest `hugo.toml` (`siteRootDir`).
+  `cleanup`, `version`. Resolves the Hugo site root by walking up from the
+  working directory to the nearest `hugo.toml` (`siteRootDir`).
 - `internal/recipes/`
   - `types.go` — `Recipe` struct; `StringOrSlice` accepts a YAML string or list.
   - `validate.go` — required/recommended field checks.
   - `convert.go` — YAML to Hugo markdown; `FindYAMLDirectory` discovery order.
+    Prunes orphaned markdown so the output mirrors the current source (keeps
+    `_index.md`).
   - `download.go` — parallel image downloads with rate limiting, retries, a
     circuit breaker, and SSRF guards; deterministic hash filenames with caching.
   - `import.go` — ZIP extraction with path-traversal and size limits.
